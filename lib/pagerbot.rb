@@ -40,7 +40,7 @@ module PagerBot
     query = PagerBot::Parsing.parse(message, bot_name)
     log.info "query=#{query.inspect}"
     answer = action_manager.dispatch(query, extra_info)
-    #log.info "answer=#{answer.inspect}"
+    log.info "answer=#{answer.inspect}"
     answer
   end
 

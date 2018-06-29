@@ -79,7 +79,7 @@ module PagerBot
 
     def send_message(message, channel)
       logger.info "Responding.", channel: channel, text: message
-      @client.web_client.chat_postMessage channel: channel, text: message, as_user: true, unfurl_links: false
+      @client.web_client.chat_postMessage channel: channel, text: message.force_encoding(Encoding::UTF_8), as_user: true, unfurl_links: false
     end
   end
 end

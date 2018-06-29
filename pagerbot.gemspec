@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activesupport'
+  spec.add_dependency 'activesupport', '5.2.0'
   spec.add_dependency 'bson_ext'
   spec.add_dependency 'chronic'
   spec.add_dependency 'chronic_duration'
@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'slack-ruby-client'
   spec.add_dependency 'thin'
 
-  spec.add_development_dependency 'minitest', '< 5.0'
+  spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'minitest-reporters'
   spec.add_development_dependency 'mocha'
   spec.add_development_dependency 'dotenv'
