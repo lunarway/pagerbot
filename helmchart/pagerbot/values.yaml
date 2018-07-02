@@ -1,0 +1,21 @@
+# Default values for pagerbot.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.s
+namespace: default
+
+mongo:
+  name: mongo
+  image:
+    repository: mongo
+    tag: 3
+
+pagerbotAdmin:
+  name: pagerbot-admin
+
+pagerbot:
+  name: pagerbot
+  deployed: false
+
+image:
+  repository: quay.io/lunarway/pagerbot
+  tag: 0.0.1

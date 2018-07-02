@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.pagerbot.name }}
+  name: {{ .Values.pagerbot.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.pagerbot.name }}
+    spec:
+      containers:
+      - args:
+        - rerun
+        - -b
+        - --
+        - ruby
+        - lib/pagerbot.rb
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        name: {{ .Values.pagerbot.name }}
+        env:
+          - name: LOG_LEVEL
+            value: "debug"
+          - name: MONGODB_URI
+            value: "mongodb://mongo:27017/pagerbot"
+          - name: DEPLOYED
+            value: "{{ .Values.pagerbot.deployed }}"
+      restartPolicy: Always
+

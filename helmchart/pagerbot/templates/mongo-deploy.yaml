@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: {{ .Values.mongo.name }}
+  name: {{ .Values.mongo.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mongo.name }}
+    spec:
+      containers:
+      - image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
+        name: {{ .Values.mongo.name }}
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - mountPath: /data/db
+          name: "{{ .Values.mongo.name }}-pvc"
+      restartPolicy: Always
+      volumes:
+      - name: "{{ .Values.mongo.name }}-pvc"
+        persistentVolumeClaim:
+          claimName: "{{ .Values.mongo.name }}-pvc"

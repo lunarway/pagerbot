@@ -1,7 +1,8 @@
-PagerBot [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/lunarway/pagerbot) [![Build Status](https://travis-ci.org/stripe-contrib/pagerbot.svg?branch=master)](https://travis-ci.org/stripe-contrib/pagerbot)
-========
+# PagerBot-k8s
 
-Pagerbot is a bot that makes managing [PagerDuty](http://www.pagerduty.com/) on-call schedules easier. It currently supports IRC and Slack, and can be easily deployed to Heroku.
+**This project was originaly created by the great people of [stripe-contrip](https://github.com/stripe-contrib/pagerbot). This fork adapts the deployment of pagerbot to kubernetes instead of the original deployment model of heroku.**
+
+Pagerbot is a bot that makes managing [PagerDuty](http://www.pagerduty.com/) on-call schedules easier. It currently supports IRC and Slack, and can be easily deployed to kubernetes.
 
 Pagerbot uses [Chronic](https://github.com/mojombo/chronic) for natural language date and time parsing.
 
@@ -13,11 +14,23 @@ Sample
 Usage
 ======
 
-The easiest way to get started is to use the Heroku button above to launch an admin interface for pagerbot, where you need to fill out a few API keys and choose commands (plugins) that pagerbot knows about and responds to.
+The easiest way to test this project out is to use `minikube` on your local machine. This projects wraps the deployment of pagerbot using `helm` and allow you to run the bot with the following command, once helm is initialized: 
+
+```
+helm install .  --name pagerbot
+```
+
+This command deploys three services to your kubernetes cluster.  
+
+* pagerbot  
+  * this is the bot itself
+* pagerbot-admin
+  * this is the administration panel, for setting up integration with pagerduty and slack, etc.
+* mongo
+  * data store used for storing configurations
 
 Going through the admin page shouldn't take much longer than 8 minutes. The admin page also contains detailed information on how to make the bot join your channel.
 
-To start up the admin interface again, rescale the dynos to have a single web worker and remove the DEPLOYED config variable in heroku dashboard.
 
 Plugins
 =======
@@ -55,27 +68,49 @@ docker-compose up --build pagerbot-admin
 docker-compose up --build pagerbot
 ```
 
-Deploying via heroku
-=======
-
-To deploy it to heroku, git clone, create a heroku app and push to launch it.
-```bash
-heroku create
-heroku addons:add mongolab:sandbox
-heroku addons:add papertrail
-git push heroku master
-```
-
 For developing new capabilities, PagerDuty has two different APIs:
 
 * The [Integration API](https://developer.pagerduty.com/documentation/integration/events) is a high-availability endpoint for triggering and updating incidents.
 * The [REST API](https://developer.pagerduty.com/documentation/rest) provides CRUD for most PagerDuty account objects, such as users, schedules, escalation policies, etc
 
+Deploying in kubernetes
+=======
+
+To deploy it to kubernetes:
+
+Start minikube
+```bash
+minikube start
+```
+Install helm in your cluster
+```
+helm init
+```
+Go to the helm chart
+```
+cd helmchart/pagerbot
+````
+Install the chart:
+```
+helm install .  --name pagerbot
+```
+To open the admin page, port-forward the pagerbot-admin webapp to your localhost:4567:
+```
+kubectl port-forward <pagerbot-admin-*> 4567:4567
+```
+After completing the configuration in the admin panel, update the values.yaml file with `deployed: true`
+```
+pagerbot:
+  name: pagerbot
+  deployed: true
+```
+and lastly upgrade the deployment:
+```
+helm upgrade pagerbot .
+```
+
 FAQ
 ====
-
-### Heroku is asking for my credit card! Do I need to pay for this?
-No, running your own pagerbot is free! This is a requirement of the free MongoDB add-on. See the [verification policy of Heroku](https://devcenter.heroku.com/articles/account-verification#verification-requirement).
 
 ### How can I secure the admin interface?
 
@@ -83,13 +118,3 @@ Set the enviroment variable called `PROTECT_ADMIN` to be your desired password. 
 
 When using the admin interface, enter the same password, the username can be arbitrary.
 
-### How can I relaunch the admin interface?
-
-Via web:
-* [Log into heroku](https://dashboard.heroku.com/) and navigate to your application.
-* **If it's a slackbot:** go to settings and remove DEPLOYED config variable.
-* **If it's an irc bot:** rescale your application to have 1 web worker and 0 irc workers.
-
-Via command line:
-* **If it's a slackbot:** `heroku config:set DEPLOYED=false`
-* **If it's an irc bot:** `heroku ps:scale web=1 irc=0`
