@@ -1,6 +1,8 @@
-FROM ruby:2.5
+FROM ruby:2.5.5-alpine3.9
 
-RUN apt-get update; apt-get install libgmp3-dev openssl libssl-dev --assume-yes
+RUN apk update && \
+  apk add git g++ make openssl openssl-dev
+
 RUN mkdir /pagerbot
 
 WORKDIR /pagerbot
